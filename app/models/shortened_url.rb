@@ -23,8 +23,15 @@ class ShortenedUrl < ActiveRecord::Base
     :primary_key => :id
   )
 
-  has_many :users, :through => :visits, :source => :user
+  has_many(
+    :taggings,
+    class_name: "Tagging",
+    foreign_key: :shortened_url_id,
+    primary_key: :id
+  )
 
+  has_many :users, :through => :visits, :source => :user
+  has_many :tags, through: :taggings, source: :tag
 
 
   def self.random_code
