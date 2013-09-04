@@ -1,4 +1,5 @@
 require 'SecureRandom'
+require 'time'
 
 class ShortenedUrl < ActiveRecord::Base
 
@@ -44,10 +45,15 @@ class ShortenedUrl < ActiveRecord::Base
   end
 
   def num_clicks
-    Visit.count(conditions: "shortened_url_id = #{self.id}")
+    Visit.count(conditions: ["shortened_url_id = ?", self.id])
   end
 
   def num_uniques
-    Visit.count(distinct: true, conditions: "shortened_url_id = #{self.id}")
+    Visit.count('user_id', distinct: true, conditions: ["shortened_url_id = ?", self.id])
+  end
+
+  def num_recent_uniques
+    # 10.minutes.ago
+    Visit.count('user_id', distinct: true, conditions: ["shortened_url_id = ? AND created_at > ?", self.id, 10.minutes.ago])
   end
 end
